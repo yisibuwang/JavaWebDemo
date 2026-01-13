@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+    <!--依据contextConfigLocation配置，通过监听器的方式启动容器-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name> <!-- 固定的配置项标记 -->
+        <param-value>classpath:spring/spring-base.xml</param-value> <!-- Spring核心配置文件 -->
+    </context-param>
+    <listener>
+        <listener-class> <!-- 依据contextConfigLocation配置，启动Spring容器 -->
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
+    <!---分发处理器，用于处理web应用中的所有http请求，负责将请求分发到相应的处理器controller-->
+    <servlet>
+        <servlet-name>SpringMVCServlet</servlet-name>
+        <servlet-class>
+            org.springframework.web.servlet.DispatcherServlet
+        </servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring/spring-mvc.xml</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SpringMVCServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!--在web请求和响应处理过程中，需要通过过滤器进行所需编码的配置-->
+    <filter>
+        <filter-name>EncodingFilter</filter-name>
+        <filter-class>
+            org.springframework.web.filter.CharacterEncodingFilter
+        </filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>EncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!--表单过滤器,让SpringMVC支持对非简单请求(除get和post)中的参数进行解析-->
+    <filter>
+        <filter-name>formContentFilter</filter-name>
+        <filter-class>org.springframework.web.filter.FormContentFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>formContentFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+</web-app>
