@@ -74,22 +74,72 @@ public class DB implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {                       //web启动时候会自动执行
         DB db = new DB();
         Connection conn = db.getConnection();
-        String checkTable = "SHOW TABLES LIKE 'student'";// 检查表是否存在，不存在时才创建
+        String checkTable = "SHOW TABLES LIKE 'merchant'";// 检查表是否存在，不存在时才创建
         ResultSet rs = db.executeQuery(conn, checkTable);
         try {
             if (!rs.next()) {
-                String create_sql = "create table student(\n" +
-                        "\tsno int primary key not null auto_increment,\n" +
-                        "\tsname varchar(20),\n" +
-                        "\tsbirth date,\n" +
-                        "\tsclass varchar(20)\n" +
+                String create_merchant = "create table merchant(\n" +                       //商家表
+                        "\tmid int primary key not null auto_increment,\n" +    //商家id
+                        "\tmname varchar(20),\n" +                              //商家名字
+                        "\tphone varchar(11),\n" +                              //商家电话
+                        "\taddress varchar(255),\n" +                            //商家地址
+                        "\tPicture blob,\n" +                                   //商家图片
+                        "\tscore varchar(20) default 0,\n" +                              //商家评分
+                        "\tstatus tinyint(1) default 1\n" +                               //商家状态
                         ")";
-                db.executeUpdate(conn, create_sql);
-                String insert_sql = "insert into student(sname,sbirth,sclass) values(?,?,?)"; //模板语句
-                db.executeUpdate(conn, insert_sql, new Object[]{"xiaozhao","2006-01-01","751"});
-                db.executeUpdate(conn, insert_sql, new Object[]{"xiaoqian","2006-02-01","752"});
-                db.executeUpdate(conn, insert_sql, new Object[]{"xiaosun","2006-03-01","753"});
-                db.executeUpdate(conn, insert_sql, new Object[]{"xiaoli","2006-04-01","754"});
+                db.executeUpdate(conn, create_merchant);
+
+                String create_Type = "create table type(\n" +                               //商品分类表
+                        "\ttypeid int primary key not null auto_increment,\n" +//分类id
+                        "\ttypename varchar(20) not null,\n" +                 //分类名字
+                        "\tmid int not null\n" +                               //商家id
+                        ")";
+                db.executeUpdate(conn, create_Type);
+
+                String create_Product = "create table Product(\n" +                         //商品表
+                        "\tProductid int primary key not null auto_increment,\n" +//商品id
+                        "\tProductname varchar(100) not null,\n" +                 //商品名字
+                        "\tDescription varchar(255),\n" +                         //商品描述
+                        "\tPrice decimal default 1,\n" +                                    //商品价格
+                        "\tPicture blob,\n" +                                     //商品图片
+                        "\tProductstatus tinyint(1) default 1,\n" +                         //商品状态
+                        "\tmid int not null\n" +                                  //商家id
+                        ")";
+                db.executeUpdate(conn, create_Product);
+
+                String create_sku = "create table sku(\n" +                                 //商品规格表
+                        "\tskuid int primary key not null auto_increment,\n" +    //规格id
+                        "\tProductid int not null,\n" +                           //商品id
+                        "\tDescription varchar(255),\n" +                         //规格描述
+                        "\tChange decimal default 0,\n" +                                   //变化
+                        "\tInventory int default 1,\n" +                                    //库存
+                        ")";
+                db.executeUpdate(conn, create_sku);
+
+                String create_cart = "create table cart(\n" +                                 //购物车表
+                        "\tcartid int primary key not null auto_increment,\n" +    //id
+                        "\tskuid int not null,\n" +                               //规格id
+                        "\tProductid int not null,\n" +                           //商品id
+                        "\tquantity int not null default 1,\n" +                            //数量
+                        ")";
+                db.executeUpdate(conn, create_cart);
+
+                String create_orders = "create table orders(\n" +                                 //购物车表
+                        "\tordersid int primary key not null auto_increment,\n" +    //id
+                        "\tcartid int not null,\n" +                               //规格id
+                        ")";
+                db.executeUpdate(conn, create_orders);
+
+                String insert_merchant = "insert into merchant(mid,mname,phone,address,score,status) values(?,?,?,?,?)"; //模板语句
+                db.executeUpdate(conn, insert_merchant, new Object[]{"1","沙县小吃","114514","下北泽23-14号","2","1"});
+                String insert_Type = "insert into merchant(typeid,typename,mid) values(?,?,?)"; //模板语句
+                db.executeUpdate(conn, insert_Type, new Object[]{"1","美食小吃","1"});
+                String insert_Product = "insert into merchant(Productid,Productname,Description,Price,Productstatus,mid) values(?,?,?,?,?)"; //模板语句
+                db.executeUpdate(conn, insert_Product, new Object[]{"1","鸡腿饭","我是描述","10","1","1"});
+                String insert_sku1 = "insert into merchant(skuid,Productid,Description,Change,Inventory) values(?,?,?,?,?)"; //模板语句
+                db.executeUpdate(conn, insert_sku1, new Object[]{"1","1","加根香肠","2","99"});
+                String insert_sku2 = "insert into merchant(skuid,Productid,Description,Change,Inventory) values(?,?,?,?,?)"; //模板语句
+                db.executeUpdate(conn, insert_sku2, new Object[]{"2","1","不要鸡腿","-2","99"});
 
                 db.closeResource(conn);//关闭数据库连接
             }
