@@ -231,7 +231,7 @@
             <div class="nav">
                 <div class="nav-item active" onclick="location.href='index.jsp'">首页</div>
                 <div class="nav-item" onclick="location.href='order.jsp'">订单</div>
-                <div class="nav-item" onclick="location.href='#'">我的</div>
+                <div class="nav-item" onclick="location.href='admin/product.jsp'">后台管理</div>
             </div>
         </div>
     </div>

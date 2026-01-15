@@ -296,7 +296,7 @@
                         <td>${product.productname}</td>
                         <td>${product.description}</td>
                         <td>¥${product.price}</td>
-                        <td>${product.productstatus === 1 ? '启用' : '禁用'}</td>
+                        <td>${product.productstatus == 1 ? '启用' : '禁用'}</td>
                         <td>${product.mid}</td>
                         <td>
                             <div class="action-buttons">
