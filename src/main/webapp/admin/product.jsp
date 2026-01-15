@@ -384,18 +384,66 @@
             const status = document.getElementById('productStatus').value;
             const mid = document.getElementById('productMid').value;
             
-            // 这里可以添加保存商品的API调用
-            alert('商品保存成功');
-            closeModal();
-            loadProducts();
+            try {
+                let url = '/api/product';
+                let method = 'POST';
+                
+                const productData = {
+                    productname: name,
+                    description: description,
+                    price: parseFloat(price),
+                    productstatus: parseInt(status),
+                    mid: parseInt(mid)
+                };
+                
+                if (id) {
+                    method = 'PUT';
+                    productData.productid = parseInt(id);
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(productData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message);
+                    closeModal();
+                    loadProducts();
+                } else {
+                    alert('操作失败: ' + result.message);
+                }
+            } catch (error) {
+                console.error('保存商品失败:', error);
+                alert('保存失败，请刷新重试');
+            }
         }
 
         // 删除商品
         async function deleteProduct(id) {
             if (confirm('确定要删除这个商品吗？')) {
-                // 这里可以添加删除商品的API调用
-                alert('商品删除成功');
-                loadProducts();
+                try {
+                    const response = await fetch(`/api/product?productid=${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert(result.message);
+                        loadProducts();
+                    } else {
+                        alert('删除失败: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('删除商品失败:', error);
+                    alert('删除失败，请刷新重试');
+                }
             }
         }
 

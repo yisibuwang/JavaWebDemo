@@ -350,18 +350,66 @@
             const score = document.getElementById('merchantScore').value;
             const status = document.getElementById('merchantStatus').value;
             
-            // 这里可以添加保存商家的API调用
-            alert('商家保存成功');
-            closeModal();
-            loadMerchants();
+            try {
+                let url = '/api/merchant';
+                let method = 'POST';
+                
+                const merchantData = {
+                    mname: name,
+                    phone: phone,
+                    address: address,
+                    score: score,
+                    status: parseInt(status)
+                };
+                
+                if (id) {
+                    method = 'PUT';
+                    merchantData.mid = parseInt(id);
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(merchantData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message);
+                    closeModal();
+                    loadMerchants();
+                } else {
+                    alert('操作失败: ' + result.message);
+                }
+            } catch (error) {
+                console.error('保存商家失败:', error);
+                alert('保存失败，请刷新重试');
+            }
         }
 
         // 删除商家
         async function deleteMerchant(id) {
             if (confirm('确定要删除这个商家吗？')) {
-                // 这里可以添加删除商家的API调用
-                alert('商家删除成功');
-                loadMerchants();
+                try {
+                    const response = await fetch(`/api/merchant?mid=${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert(result.message);
+                        loadMerchants();
+                    } else {
+                        alert('删除失败: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('删除商家失败:', error);
+                    alert('删除失败，请刷新重试');
+                }
             }
         }
 
