@@ -4,7 +4,7 @@ public class sku {
     int skuid;
     int Productid;
     String Description;
-    int Change;
+    int ChangePrice;
     int Inventory;
 
     public sku(){
@@ -15,7 +15,7 @@ public class sku {
         this.skuid = skuid;
         Productid = productid;
         Description = description;
-        Change = change;
+        ChangePrice = change;
         Inventory = inventory;
     }
 
@@ -43,12 +43,12 @@ public class sku {
         Description = description;
     }
 
-    public int getChange() {
-        return Change;
+    public int getChangePrice() {
+        return ChangePrice;
     }
 
-    public void setChange(int change) {
-        Change = change;
+    public void setChangePrice(int changePrice) {
+        ChangePrice = changePrice;
     }
 
     public int getInventory() {

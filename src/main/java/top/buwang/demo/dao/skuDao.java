@@ -21,7 +21,7 @@ public class skuDao {
                 s.setSkuid(rs.getInt("skuid"));
                 s.setProductid(rs.getInt("productid"));
                 s.setDescription(rs.getString("description"));
-                s.setChange(rs.getInt("change"));
+                s.setChangePrice(rs.getInt("changePrice"));
                 s.setInventory(rs.getInt("inventory"));
                 skuList.add(s);
             }
@@ -35,12 +35,12 @@ public class skuDao {
         return skuList;
     }
 
-    public boolean addSku(int productid, String description, int change, int inventory) {
+    public boolean addSku(int productid, String description, int changePrice, int inventory) {
         Connection conn = null;
         try{
             conn = db.getConnection();
-            String add_sku = "insert into sku(productid,description,change,inventory) values(?,?,?,?)";
-            int row = db.executeUpdate(conn, add_sku, new Object[]{productid,description,change,inventory});
+            String add_sku = "insert into sku(productid,description,changePrice,inventory) values(?,?,?,?)";
+            int row = db.executeUpdate(conn, add_sku, new Object[]{productid,description,changePrice,inventory});
             return row > 0;
         }
         catch (RuntimeException e)
@@ -52,12 +52,12 @@ public class skuDao {
         }
     }
 
-    public boolean updateSku(int skuid, int productid, String description, int change, int inventory) {
+    public boolean updateSku(int skuid, int productid, String description, int changePrice, int inventory) {
         Connection conn = null;
         try{
             conn = db.getConnection();
-            String update_sku = "update sku set productid = ?,description = ?,change = ?,inventory = ? where skuid = ?";
-            int row = db.executeUpdate(conn, update_sku, new Object[]{productid,description,change,inventory,skuid});
+            String update_sku = "update sku set productid = ?,description = ?,changePrice = ?,inventory = ? where skuid = ?";
+            int row = db.executeUpdate(conn, update_sku, new Object[]{productid,description,changePrice,inventory,skuid});
             return row > 0;
         }
         catch (RuntimeException e)
