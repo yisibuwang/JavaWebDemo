@@ -252,15 +252,15 @@
             <div class="nav">
                 <div class="nav-item" onclick="location.href='index.jsp'">首页</div>
                 <div class="nav-item" onclick="location.href='order.jsp'">订单</div>
-                <div class="nav-item" onclick="location.href='#'">我的</div>
+                <div class="nav-item" onclick="location.href='admin/product.jsp'">后台管理</div>
             </div>
         </div>
     </div>
 
     <div class="main-content">
         <div class="merchant-header">
-            <div class="merchant-name">沙县小吃</div>
-            <div class="merchant-info">电话: 114514 | 地址: 下北泽23-14号 | 评分: 2</div>
+            <div class="merchant-name" id="merchantName">加载中...</div>
+            <div class="merchant-info" id="merchantInfo">加载中...</div>
         </div>
 
         <div class="product-section">
@@ -295,21 +295,64 @@
         // 购物车数据
         let cart = [];
         
+        // 获取URL参数
+        function getUrlParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        
+        // 加载商家信息
+        async function loadMerchantInfo() {
+            const merchantId = getUrlParam('id');
+            if (!merchantId) {
+                document.getElementById('merchantName').textContent = '商家ID不存在';
+                document.getElementById('merchantInfo').textContent = '请从首页选择商家';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/merchant');
+                const merchants = await response.json();
+                const merchant = merchants.find(m => m.mid == merchantId);
+                
+                if (merchant) {
+                    document.getElementById('merchantName').textContent = merchant.mname;
+                    document.getElementById('merchantInfo').textContent = `电话: ${merchant.phone} | 地址: ${merchant.address} | 评分: ${merchant.score}`;
+                } else {
+                    document.getElementById('merchantName').textContent = '商家不存在';
+                    document.getElementById('merchantInfo').textContent = '请从首页选择商家';
+                }
+            } catch (error) {
+                console.error('加载商家信息失败:', error);
+                document.getElementById('merchantName').textContent = '加载失败';
+                document.getElementById('merchantInfo').textContent = '请刷新页面重试';
+            }
+        }
+        
         // 加载商品列表
         async function loadProducts() {
+            const merchantId = getUrlParam('id');
+            if (!merchantId) {
+                document.getElementById('productList').innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">商家ID不存在，请从首页选择商家</div>';
+                return;
+            }
+            
             try {
                 const response = await fetch('/api/product');
                 const products = await response.json();
                 
+                // 根据商家ID过滤商品
+                const filteredProducts = products.filter(product => product.mid == merchantId);
+                
                 const productList = document.getElementById('productList');
                 productList.innerHTML = '';
                 
-                if (products.length === 0) {
+                if (filteredProducts.length === 0) {
                     productList.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">暂无商品</div>';
                     return;
                 }
                 
-                products.forEach(product => {
+                filteredProducts.forEach(product => {
                     const productCard = document.createElement('div');
                     productCard.className = 'product-card';
                     
@@ -435,6 +478,7 @@
 
         // 事件绑定
         document.addEventListener('DOMContentLoaded', function() {
+            loadMerchantInfo();
             loadProducts();
             updateCartDisplay();
             

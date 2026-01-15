@@ -3,12 +3,12 @@ package top.buwang.demo.vo;
 import java.math.BigDecimal;
 
 public class Product {
-    int Productid;
-    String Productname;
-    String Description;
-    BigDecimal Price;  // 改为BigDecimal以适应数据库中的decimal类型
-    byte[] Picture;
-    int Productstatus;
+    int productid;
+    String productname;
+    String description;
+    BigDecimal price;  // 改为BigDecimal以适应数据库中的decimal类型
+    byte[] picture;
+    int productstatus;
     int mid;
 
     public Product() {
@@ -16,61 +16,61 @@ public class Product {
     }
 
     public Product(int productid, String productname, String description, BigDecimal price, byte[] picture, int productstatus, int mid) {
-        Productid = productid;
-        Productname = productname;
-        Description = description;
-        Price = price;
-        Picture = picture;
-        Productstatus = productstatus;
+        this.productid = productid;
+        this.productname = productname;
+        this.description = description;
+        this.price = price;
+        this.picture = picture;
+        this.productstatus = productstatus;
         this.mid = mid;
     }
 
     public int getProductid() {
-        return Productid;
+        return productid;
     }
 
     public void setProductid(int productid) {
-        Productid = productid;
+        this.productid = productid;
     }
 
     public String getProductname() {
-        return Productname;
+        return productname;
     }
 
     public void setProductname(String productname) {
-        Productname = productname;
+        this.productname = productname;
     }
 
     public String getDescription() {
-        return Description;
+        return description;
     }
 
     public void setDescription(String description) {
-        Description = description;
+        this.description = description;
     }
 
     public BigDecimal getPrice() {
-        return Price;
+        return price;
     }
 
     public void setPrice(BigDecimal price) {
-        Price = price;
+        this.price = price;
     }
 
     public byte[] getPicture() {
-        return Picture;
+        return picture;
     }
 
     public void setPicture(byte[] picture) {
-        Picture = picture;
+        this.picture = picture;
     }
 
     public int getProductstatus() {
-        return Productstatus;
+        return productstatus;
     }
 
     public void setProductstatus(int productstatus) {
-        Productstatus = productstatus;
+        this.productstatus = productstatus;
     }
 
     public int getMid() {

@@ -1,18 +1,17 @@
 package top.buwang.demo.controller;
 
-import top.buwang.demo.vo.merchant;
-import top.buwang.demo.dao.merchantDao;
+import java.io.IOException;
+import java.util.List;
+
+import com.alibaba.fastjson2.JSON;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import com.alibaba.fastjson2.JSON;
-
-import java.io.IOException;
-import java.util.List;
+import top.buwang.demo.dao.merchantDao;
+import top.buwang.demo.vo.merchant;
 
 @WebServlet("/api/merchant")
 public class MerchantController extends HttpServlet {
