@@ -1,10 +1,12 @@
 package top.buwang.demo.vo;
 
+import java.math.BigDecimal;
+
 public class Product {
     int Productid;
     String Productname;
     String Description;
-    int Price;
+    BigDecimal Price;  // 改为BigDecimal以适应数据库中的decimal类型
     byte[] Picture;
     int Productstatus;
     int mid;
@@ -13,7 +15,7 @@ public class Product {
 
     }
 
-    public Product(int productid, String productname, String description, int price, byte[] picture, int productstatus, int mid) {
+    public Product(int productid, String productname, String description, BigDecimal price, byte[] picture, int productstatus, int mid) {
         Productid = productid;
         Productname = productname;
         Description = description;
@@ -47,11 +49,11 @@ public class Product {
         Description = description;
     }
 
-    public int getPrice() {
+    public BigDecimal getPrice() {
         return Price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(BigDecimal price) {
         Price = price;
     }
 

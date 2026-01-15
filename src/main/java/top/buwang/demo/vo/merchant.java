@@ -5,7 +5,7 @@ public class merchant {
     String mname;
     int phone;
     String address;
-    byte[] Picture;
+    byte[] picture;  // 改为小写
     String score;
     int status;
 
@@ -18,7 +18,7 @@ public class merchant {
         this.mname = mname;
         this.phone = phone;
         this.address = address;
-        Picture = picture;
+        this.picture = picture;  // 改为小写
         this.score = score;
         this.status = status;
     }
@@ -56,11 +56,11 @@ public class merchant {
     }
 
     public byte[] getPicture() {
-        return Picture;
+        return picture;  // 改为小写
     }
 
     public void setPicture(byte[] picture) {
-        Picture = picture;
+        this.picture = picture;  // 改为小写
     }
 
     public String getScore() {

@@ -1,22 +1,24 @@
 package top.buwang.demo.vo;
 
+import java.math.BigDecimal;
+
 public class sku {
     int skuid;
     int Productid;
     String Description;
-    int ChangePrice;
+    BigDecimal ChangePrice;  // 改为BigDecimal
     int Inventory;
 
     public sku(){
 
     }
 
-    public sku(int skuid, int productid, String description, int change, int inventory) {
+    public sku(int skuid, int productid, String description, BigDecimal change, BigDecimal inventory) {
         this.skuid = skuid;
         Productid = productid;
         Description = description;
         ChangePrice = change;
-        Inventory = inventory;
+        Inventory = inventory.intValue(); // 如果传入的是BigDecimal则转换为int
     }
 
     public int getSkuid() {
@@ -43,11 +45,11 @@ public class sku {
         Description = description;
     }
 
-    public int getChangePrice() {
+    public BigDecimal getChangePrice() {
         return ChangePrice;
     }
 
-    public void setChangePrice(int changePrice) {
+    public void setChangePrice(BigDecimal changePrice) {
         ChangePrice = changePrice;
     }
 

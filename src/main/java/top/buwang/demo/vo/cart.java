@@ -3,7 +3,7 @@ package top.buwang.demo.vo;
 public class cart {
     int cartid;
     int skuid;
-    int Productid;
+    int productid;  // 改为小写
     int quantity;
 
     public cart(){
@@ -13,7 +13,7 @@ public class cart {
     public cart(int cartid, int skuid, int productid, int quantity) {
         this.cartid = cartid;
         this.skuid = skuid;
-        Productid = productid;
+        this.productid = productid;  // 改为小写
         this.quantity = quantity;
     }
 
@@ -34,11 +34,11 @@ public class cart {
     }
 
     public int getProductid() {
-        return Productid;
+        return productid;  // 改为小写
     }
 
     public void setProductid(int productid) {
-        Productid = productid;
+        this.productid = productid;  // 改为小写
     }
 
     public int getQuantity() {

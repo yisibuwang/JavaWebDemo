@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 public class skuDao {
     DB db = new DB();
-
     public List<sku> getAllSku(){
         List<sku> skuList = new ArrayList<sku>();
         Connection conn = null;
@@ -21,7 +20,7 @@ public class skuDao {
                 s.setSkuid(rs.getInt("skuid"));
                 s.setProductid(rs.getInt("productid"));
                 s.setDescription(rs.getString("description"));
-                s.setChangePrice(rs.getInt("changePrice"));
+                s.setChangePrice(rs.getBigDecimal("changeprice"));
                 s.setInventory(rs.getInt("inventory"));
                 skuList.add(s);
             }
@@ -39,7 +38,7 @@ public class skuDao {
         Connection conn = null;
         try{
             conn = db.getConnection();
-            String add_sku = "insert into sku(productid,description,changePrice,inventory) values(?,?,?,?)";
+            String add_sku = "insert into sku(productid,description,changeprice,inventory) values(?,?,?,?)";
             int row = db.executeUpdate(conn, add_sku, new Object[]{productid,description,changePrice,inventory});
             return row > 0;
         }

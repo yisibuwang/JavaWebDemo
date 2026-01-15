@@ -2,6 +2,7 @@ package top.buwang.demo.dao;
 
 import top.buwang.demo.vo.merchant;
 import top.buwang.demo.util.DB;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

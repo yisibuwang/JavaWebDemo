@@ -14,7 +14,7 @@ public class typeDao {      //依旧操作数据的类
         Connection conn = null;
         try {
             conn = db.getConnection();
-            String get_type = "select * from type";
+            String get_type = "select * from type";  // 已经是小写
             ResultSet rs = db.executeQuery(conn, get_type);
             while(rs.next()) {
                 Type t = new Type();
@@ -37,7 +37,7 @@ public class typeDao {      //依旧操作数据的类
         Connection conn = null;
         try{
             conn = db.getConnection();
-            String add_type = "insert into type(typename,mid) values(?,?)";
+            String add_type = "insert into type(typename,mid) values(?,?)";  // 已经是小写
             int row = db.executeUpdate(conn, add_type, new Object[]{typename,mid});
             return row > 0;
         }
@@ -54,7 +54,7 @@ public class typeDao {      //依旧操作数据的类
         Connection conn = null;
         try{
             conn = db.getConnection();
-            String update_type = "update type set typename = ?,mid = ? where typeid = ?";
+            String update_type = "update type set typename = ?,mid = ? where typeid = ?";  // 已经是小写
             int row = db.executeUpdate(conn, update_type, new Object[]{typename,mid,typeid});
             return row > 0;
         }
@@ -71,7 +71,7 @@ public class typeDao {      //依旧操作数据的类
         Connection conn = null;
         try{
             conn = db.getConnection();
-            String delete_type = "delete from type where typeid = ?";
+            String delete_type = "delete from type where typeid = ?";  // 已经是小写
             int row = db.executeUpdate(conn, delete_type, new Object[]{typeid});
             return row > 0;
         }

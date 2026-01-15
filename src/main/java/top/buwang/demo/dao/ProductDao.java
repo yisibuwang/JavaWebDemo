@@ -3,6 +3,7 @@ package top.buwang.demo.dao;
 import top.buwang.demo.vo.Product;
 import top.buwang.demo.util.DB;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class ProductDao {
                 p.setProductid(rs.getInt("productid"));
                 p.setProductname(rs.getString("productname"));
                 p.setDescription(rs.getString("description"));
-                p.setPrice(rs.getInt("price"));
+                p.setPrice(rs.getBigDecimal("price"));  // 使用getBigDecimal
                 p.setPicture(rs.getBytes("picture"));
                 p.setProductstatus(rs.getInt("productstatus"));
                 p.setMid(rs.getInt("mid"));
@@ -36,7 +37,7 @@ public class ProductDao {
         return productList;
     }
 
-    public boolean addProduct(String productname, String description, int price, byte[] picture, int productstatus, int mid) {
+    public boolean addProduct(String productname, String description, BigDecimal price, byte[] picture, int productstatus, int mid) {
         Connection conn = null;
         try{
             conn = db.getConnection();
@@ -50,7 +51,7 @@ public class ProductDao {
         }
     }
 
-    public boolean updateProduct(int productid, String productname, String description, int price, byte[] picture, int productstatus, int mid) {
+    public boolean updateProduct(int productid, String productname, String description, BigDecimal price, byte[] picture, int productstatus, int mid) {
         Connection conn = null;
         try{
             conn = db.getConnection();
