@@ -39,7 +39,7 @@ public class merchantDao {          //数据用的操作类
         return merchantList;
     }
 
-    public boolean addMerchant(String mname, int phone, String address, byte[] picture, String score, int status) {    //添加商户，不需要mid让他自己自增
+    public boolean addMerchant(String mname, String phone, String address, byte[] picture, String score, int status) {    //添加商户，不需要mid让他自己自增
         Connection conn = null;
         try {
             conn = db.getConnection();
@@ -55,7 +55,7 @@ public class merchantDao {          //数据用的操作类
         }
     }
 
-    public boolean updateMerchant(int mid, String mname, int phone, String address, byte[] picture, String score, int status) {     //修改商户信息,这个得要mid
+    public boolean updateMerchant(int mid, String mname, String phone, String address, byte[] picture, String score, int status) {     //修改商户信息,这个得要mid
         Connection conn = null;
         try {
             conn = db.getConnection();
