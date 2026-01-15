@@ -2,6 +2,9 @@ package top.buwang.demo.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
@@ -15,20 +18,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import top.buwang.demo.dao.merchantDao;
 import top.buwang.demo.vo.merchant;
 
-@WebServlet("/api/merchant")
+@WebServlet("/index")
 public class MerchantController extends HttpServlet {
     merchantDao merchantDao = new merchantDao();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {       //查询所有商户信息
         response.setContentType("application/json; charset=UTF-8");
         List<merchant> merchants = merchantDao.getAllMerchant();
-        response.getWriter().write(JSON.toJSONString(merchants));
+        String list = JSON.toJSONString(merchants);
+        PrintWriter out = response.getWriter();
+        out.write(list);
     }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json; charset=UTF-8");
         
         // 读取请求体
         InputStream inputStream = request.getInputStream();

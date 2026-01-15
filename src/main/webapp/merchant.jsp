@@ -311,7 +311,7 @@
             }
             
             try {
-                const response = await fetch('/api/merchant');
+                const response = await fetch('/index');
                 const merchants = await response.json();
                 const merchant = merchants.find(m => m.mid == merchantId);
                 

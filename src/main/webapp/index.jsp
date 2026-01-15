@@ -216,7 +216,7 @@
             cursor: pointer;
             font-weight: 600;
         }
-        
+
         .loading {
             text-align: center;
             padding: 20px;
@@ -225,168 +225,256 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <div class="logo">外卖</div>
-            <div class="nav">
-                <div class="nav-item active" onclick="location.href='index.jsp'">首页</div>
-                <div class="nav-item" onclick="location.href='order.jsp'">订单</div>
-                <div class="nav-item" onclick="location.href='admin/product.jsp'">后台管理</div>
-            </div>
+<div class="header">
+    <div class="header-content">
+        <div class="logo">外卖</div>
+        <div class="nav">
+            <div class="nav-item active" onclick="location.href='index.jsp'">首页</div>
+            <div class="nav-item" onclick="location.href='order.jsp'">订单</div>
+            <div class="nav-item" onclick="location.href='admin/product.jsp'">后台管理</div>
         </div>
     </div>
+</div>
 
-    <div class="main-content">
-        <div class="search-bar">
-            <input type="text" class="search-input" placeholder="搜索商家或商品...">
-        </div>
-
-        <div class="merchant-section">
-            <div class="section-header">推荐商家</div>
-            <div class="merchant-list" id="merchantList">
-                <div class="loading" id="loadingMerchants">加载中...</div>
-            </div>
-        </div>
+<div class="main-content">
+    <div class="search-bar">
+        <input type="text" class="search-input" placeholder="搜索商家或商品...">
     </div>
 
-    <div class="cart-section" id="cartIcon">
-        🛒
-        <div class="cart-count" id="cartCount" style="display:none;">0</div>
-    </div>
-
-    <div class="cart-modal" id="cartModal">
-        <div class="modal-header">
-            <h3>购物车</h3>
-            <span id="closeCart">×</span>
-        </div>
-        <div id="orderItems">
-            <!-- 订单项目将通过JavaScript动态生成 -->
-        </div>
-        <div class="order-actions">
-            <div>总计: ¥<span id="totalPrice">0</span></div>
-            <button class="confirm-btn" id="confirmOrder">确认下单</button>
+    <div class="merchant-section">
+        <div class="section-header">推荐商家</div>
+        <div class="merchant-list" id="merchantList">
+            <div class="loading" id="loadingMerchants">加载中...</div>
         </div>
     </div>
+</div>
 
-    <script src="js/jquery-3.6.1.min.js"></script>
-    <script>
-        // 购物车数据
-        let cart = [];
-        
-        // 加载商家列表
-        async function loadMerchants() {
-            try {
-                const response = await fetch('/api/merchant');
-                const merchants = await response.json();
-                
-                const merchantList = document.getElementById('merchantList');
-                merchantList.innerHTML = '';
-                
-                if (merchants.length === 0) {
-                    merchantList.innerHTML = '<div class="loading">暂无商家</div>';
-                    return;
-                }
-                
-                merchants.forEach(merchant => {
-                    const merchantCard = document.createElement('div');
-                    merchantCard.className = 'merchant-card';
-                    merchantCard.onclick = () => showMerchantDetail(merchant.mid);
-                    
-                    merchantCard.innerHTML = `
-                        <div class="merchant-image">店铺</div>
-                        <div class="merchant-info">
-                            <div class="merchant-name">${merchant.mname}</div>
-                            <div class="merchant-meta">
-                                <span class="rating">⭐${merchant.score}</span>
-                                <span>${merchant.address}</span>
-                            </div>
-                            <div class="delivery-info">联系电话: ${merchant.phone}</div>
-                        </div>
-                    `;
-                    
-                    merchantList.appendChild(merchantCard);
-                });
-            } catch (error) {
-                console.error('加载商家失败:', error);
-                document.getElementById('merchantList').innerHTML = '<div class="loading">加载失败，请刷新重试</div>';
+<div class="cart-section" id="cartIcon">
+    🛒
+    <div class="cart-count" id="cartCount" style="display:none;">0</div>
+</div>
+
+<div class="cart-modal" id="cartModal">
+    <div class="modal-header">
+        <h3>购物车</h3>
+        <span id="closeCart">×</span>
+    </div>
+    <div id="orderItems">
+        <!-- 订单项目将通过JavaScript动态生成 -->
+    </div>
+    <div class="order-actions">
+        <div>总计: ¥<span id="totalPrice">0</span></div>
+        <button class="confirm-btn" id="confirmOrder">确认下单</button>
+    </div>
+</div>
+
+<script src="js/jquery-3.6.1.min.js"></script>
+<script>
+    // 购物车数据
+    let cart = [];
+
+    // 页面加载初始化
+    $(function(){
+        queryMerchants();  // 查询商家列表
+        bindDomEvents();   // 绑定事件
+    })
+
+    // 绑定所有DOM事件
+    function bindDomEvents(){
+        // 购物车图标点击
+        $("#cartIcon").click(function(){
+            showCart();
+        })
+
+        // 关闭购物车按钮
+        $("#closeCart").click(function(){
+            hideCart();
+        })
+
+        // 确认下单按钮
+        $("#confirmOrder").click(function(){
+            confirmOrder();
+        })
+
+        // 搜索框输入事件
+        $(".search-input").on("input", function(){
+            searchMerchants($(this).val());
+        })
+    }
+
+    // 查询商家列表（使用jQuery AJAX）
+    function queryMerchants(){
+        $.ajax({
+            type: "GET",
+            url: "/index",
+            dataType: "json",
+            success: function(merchants){
+                renderMerchants(merchants);
+            },
+            error: function(){
+                $("#merchantList").html('<div class="loading">加载失败，请刷新重试</div>');
             }
-        }
-
-        // 显示商家详情
-        function showMerchantDetail(merchantId) {
-            window.location.href = 'merchant.jsp?id=' + merchantId;
-        }
-
-        // 更新购物车显示
-        function updateCartDisplay() {
-            const cartCount = document.getElementById('cartCount');
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            
-            if (totalItems > 0) {
-                cartCount.textContent = totalItems;
-                cartCount.style.display = 'flex';
-            } else {
-                cartCount.style.display = 'none';
-            }
-        }
-
-        // 显示购物车
-        function showCart() {
-            if (cart.length === 0) {
-                alert('购物车为空，请先添加商品');
-                return;
-            }
-            
-            document.getElementById('cartModal').style.display = 'block';
-            renderOrderItems();
-        }
-
-        // 渲染订单项目
-        function renderOrderItems() {
-            const orderItemsContainer = document.getElementById('orderItems');
-            orderItemsContainer.innerHTML = '';
-            
-            cart.forEach(item => {
-                const orderItem = document.createElement('div');
-                orderItem.className = 'order-item';
-                orderItem.innerHTML = `
-                    <div>${item.name}</div>
-                    <div>¥${item.price} × ${item.quantity}</div>
-                `;
-                orderItemsContainer.appendChild(orderItem);
-            });
-            
-            updateTotalPrice();
-        }
-
-        // 更新总价
-        function updateTotalPrice() {
-            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            document.getElementById('totalPrice').textContent = totalPrice.toFixed(2);
-        }
-
-        // 事件绑定
-        document.addEventListener('DOMContentLoaded', function() {
-            loadMerchants();
-            updateCartDisplay();
-            
-            document.getElementById('cartIcon').addEventListener('click', showCart);
-            document.getElementById('closeCart').addEventListener('click', function() {
-                document.getElementById('cartModal').style.display = 'none';
-            });
-            
-            document.getElementById('confirmOrder').addEventListener('click', function() {
-                if (cart.length === 0) {
-                    alert('请先添加商品到购物车');
-                    return;
-                }
-                
-                alert('订单提交成功！感谢您的购买');
-                cart = []; // 清空购物车
-                updateCartDisplay();
-                document.getElementById('cartModal').style.display = 'none';
-            });
         });
-    </script>
+    }
+
+    // 搜索商家
+    function searchMerchants(keyword){
+        $.ajax({
+            type: "GET",
+            url: "/search",  // 搜索接口
+            data: {
+                keyword: keyword
+            },
+            dataType: "json",
+            success: function(merchants){
+                renderMerchants(merchants);
+            }
+        });
+    }
+
+    // 渲染商家列表
+    function renderMerchants(merchants){
+        const merchantList = $("#merchantList");
+        merchantList.empty();
+
+        if (merchants.length === 0) {
+            merchantList.html('<div class="loading">暂无商家</div>');
+            return;
+        }
+
+        for(let i=0; i<merchants.length; i++){
+            let merchant = merchants[i];
+            merchantList.append(
+                '<div class="merchant-card" onclick="showMerchantDetail(' + merchant.mid + ')">' +
+                '<div class="merchant-image">店铺</div>' +
+                '<div class="merchant-info">' +
+                '<div class="merchant-name">' + merchant.mname + '</div>' +
+                '<div class="merchant-meta">' +
+                '<span class="rating">⭐' + merchant.score + '</span>' +
+                '<span>' + merchant.address + '</span>' +
+                '</div>' +
+                '<div class="delivery-info">联系电话: ' + merchant.phone + '</div>' +
+                '</div>' +
+                '</div>'
+            );
+        }
+    }
+
+    // 显示商家详情（跳转到商家详情页）
+    function showMerchantDetail(merchantId){
+        window.location.href = 'merchant.jsp?id=' + merchantId;
+    }
+
+    // 添加商品到购物车（需要在商家详情页调用）
+    function addToCart(product){
+        // 查找是否已存在该商品
+        let existingItem = cart.find(item => item.id === product.id);
+
+        if(existingItem){
+            existingItem.quantity += 1;
+        } else {
+            cart.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: 1
+            });
+        }
+
+        updateCartDisplay();
+        alert("已添加到购物车");
+    }
+
+    // 更新购物车显示
+    function updateCartDisplay(){
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const cartCount = $("#cartCount");
+
+        if(totalItems > 0){
+            cartCount.text(totalItems);
+            cartCount.show();
+        } else {
+            cartCount.hide();
+        }
+    }
+
+    // 显示购物车
+    function showCart(){
+        if(cart.length === 0){
+            alert('购物车为空，请先添加商品');
+            return;
+        }
+
+        $("#cartModal").show();
+        renderOrderItems();
+    }
+
+    // 隐藏购物车
+    function hideCart(){
+        $("#cartModal").hide();
+    }
+
+    // 渲染订单项目
+    function renderOrderItems(){
+        const orderItemsContainer = $("#orderItems");
+        orderItemsContainer.empty();
+
+        for(let i=0; i<cart.length; i++){
+            let item = cart[i];
+            orderItemsContainer.append(
+                '<div class="order-item">' +
+                '<div>' + item.name + '</div>' +
+                '<div>¥' + item.price + ' × ' + item.quantity + '</div>' +
+                '</div>'
+            );
+        }
+
+        updateTotalPrice();
+    }
+
+    // 更新总价
+    function updateTotalPrice(){
+        const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        $("#totalPrice").text(totalPrice.toFixed(2));
+    }
+
+    // 确认下单
+    function confirmOrder(){
+        if(cart.length === 0){
+            alert('请先添加商品到购物车');
+            return;
+        }
+
+        // 这里可以改成发送订单数据到后端
+        // 暂时使用模拟提交
+        $.ajax({
+            type: "POST",
+            url: "/order/create",
+            data: {
+                items: JSON.stringify(cart)
+            },
+            dataType: "json",
+            success: function(response){
+                if(response.success){
+                    alert('订单提交成功！感谢您的购买');
+                    cart = []; // 清空购物车
+                    updateCartDisplay();
+                    hideCart();
+                } else {
+                    alert('订单提交失败：' + response.message);
+                }
+            }
+        });
+    }
+
+    // 获取当前登录用户（如果需要）
+    function getCurrentUser(){
+        // 这里可以从cookie或session获取用户信息
+        return {
+            userId: 1,
+            userName: "测试用户"
+        };
+    }
+</script>
 </body>
 </html>
