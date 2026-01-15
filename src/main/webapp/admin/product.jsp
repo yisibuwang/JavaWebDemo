@@ -210,7 +210,6 @@
             <div class="nav">
                 <div class="nav-item" onclick="location.href='product.jsp'">商品管理</div>
                 <div class="nav-item" onclick="location.href='merchant.jsp'">商家管理</div>
-                <div class="nav-item" onclick="location.href='order.jsp'">订单管理</div>
                 <div class="nav-item" onclick="location.href='../index.jsp'">返回前台</div>
             </div>
         </div>
@@ -267,8 +266,10 @@
                     <input type="number" id="productStatus" min="0" max="1" value="1">
                 </div>
                 <div class="form-group">
-                    <label for="productMid">商家ID</label>
-                    <input type="number" id="productMid" min="1" value="1">
+                    <label for="productMid">商家选择</label>
+                    <select id="productMid" required>
+                        <!-- 商家列表将通过JavaScript动态生成 -->
+                    </select>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="cancel-btn" onclick="closeModal()">取消</button>
@@ -283,7 +284,7 @@
         // 加载商品列表
         async function loadProducts() {
             try {
-                const response = await fetch('../api/product');
+                const response = await fetch('/api/product');
                 const products = await response.json();
                 
                 const tbody = document.querySelector('#productTable tbody');
@@ -312,27 +313,60 @@
             }
         }
 
+        // 加载商家列表到下拉框
+        async function loadMerchants() {
+            try {
+                const response = await fetch('/api/merchant');
+                const merchants = await response.json();
+                
+                const merchantSelect = document.getElementById('productMid');
+                merchantSelect.innerHTML = '';
+                
+                if (merchants.length === 0) {
+                    merchantSelect.innerHTML = '<option value="">暂无商家</option>';
+                    return;
+                }
+                
+                merchants.forEach(merchant => {
+                    const option = document.createElement('option');
+                    option.value = merchant.mid;
+                    option.textContent = merchant.mname;
+                    merchantSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('加载商家列表失败:', error);
+                document.getElementById('productMid').innerHTML = '<option value="">加载失败</option>';
+            }
+        }
+
         // 打开添加商品模态框
-        function openAddModal() {
+        async function openAddModal() {
             document.getElementById('modalTitle').textContent = '添加商品';
             document.getElementById('productId').value = '';
             document.getElementById('productName').value = '';
             document.getElementById('productDescription').value = '';
             document.getElementById('productPrice').value = '';
             document.getElementById('productStatus').value = '1';
-            document.getElementById('productMid').value = '1';
+            
+            // 加载商家列表
+            await loadMerchants();
+            
             document.getElementById('productModal').style.display = 'block';
         }
 
         // 打开编辑商品模态框
-        function openEditModal(id, name, description, price, status, mid) {
+        async function openEditModal(id, name, description, price, status, mid) {
             document.getElementById('modalTitle').textContent = '编辑商品';
             document.getElementById('productId').value = id;
             document.getElementById('productName').value = name;
             document.getElementById('productDescription').value = description;
             document.getElementById('productPrice').value = price;
             document.getElementById('productStatus').value = status;
+            
+            // 加载商家列表并设置当前商家
+            await loadMerchants();
             document.getElementById('productMid').value = mid;
+            
             document.getElementById('productModal').style.display = 'block';
         }
 

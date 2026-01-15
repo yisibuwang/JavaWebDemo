@@ -1,11 +1,13 @@
 package top.buwang.demo.dao;
 
-import top.buwang.demo.vo.merchant;
-import top.buwang.demo.util.DB;
-import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import top.buwang.demo.util.DB;
+import top.buwang.demo.vo.merchant;
 
 public class merchantDao {          //数据用的操作类
     DB db = new DB();
@@ -20,7 +22,7 @@ public class merchantDao {          //数据用的操作类
                 merchant m = new merchant();
                 m.setMid(rs.getInt("mid"));
                 m.setMname(rs.getString("mname"));
-                m.setPhone(rs.getInt("phone"));
+                m.setPhone(rs.getString("phone"));
                 m.setAddress(rs.getString("address"));
                 m.setPicture(rs.getBytes("picture"));
                 m.setScore(rs.getString("score"));

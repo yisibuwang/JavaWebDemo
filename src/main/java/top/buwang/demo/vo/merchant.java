@@ -3,7 +3,7 @@ package top.buwang.demo.vo;
 public class merchant {
     int mid;
     String mname;
-    int phone;
+    String phone;
     String address;
     byte[] picture;  // 改为小写
     String score;
@@ -13,7 +13,7 @@ public class merchant {
 
     }
 
-    public merchant(int mid, String mname, int phone, String address, byte[] picture, String score, int status) {
+    public merchant(int mid, String mname, String phone, String address, byte[] picture, String score, int status) {
         this.mid = mid;
         this.mname = mname;
         this.phone = phone;
@@ -39,11 +39,11 @@ public class merchant {
         this.mname = mname;
     }
 
-    public int getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(int phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
