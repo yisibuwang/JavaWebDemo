@@ -2,9 +2,12 @@ package top.buwang.demo.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.ArrayList;
+
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
@@ -24,18 +27,29 @@ public class ProductController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
+        String list = null;
         if(Objects.equals(action, "all")) {
             response.setContentType("application/json; charset=UTF-8");
-            List<Product> products = productDao.getAllProduct();
-            response.getWriter().write(JSON.toJSONString(products));
+            List<Product> allProducts = productDao.getAllProduct();
+            list=JSON.toJSONString(allProducts);
         }
         else if (Objects.equals(action, "get")) {
-            String mid = request.getParameter("mid");
-            List<Product> products = productDao.searchProduct(mid);
-            response.getWriter().write(JSON.toJSONString(products));
+            int mid = Integer.parseInt(request.getParameter("mid"));
+            List<Product> products = productDao.searchProductid(mid);
+            // 过滤掉状态为0的商品
+            List<Product> activeProducts = new ArrayList<>();
+            for (Product product : products) {
+                if (product.getProductstatus() != 0) {
+                    activeProducts.add(product);
+                }
+            }
+            list=JSON.toJSONString(activeProducts);
+            list=JSON.toJSONString(activeProducts);
         }
         else
             response.getWriter().write("{\"message\":\"无效的操作\"}");
+        PrintWriter out = response.getWriter();
+        out.write(list);
     }
     
     @Override

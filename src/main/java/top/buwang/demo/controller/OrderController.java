@@ -29,8 +29,7 @@ public class OrderController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json; charset=UTF-8");
         
-        // 这里可以添加订单提交的逻辑
-        // 由于我们简化了用户管理，这里直接返回成功
+        // 这里可以添加订单提交的逻辑，没时间写了，这里直接返回成功
         response.getWriter().write(JSON.toJSONString("{\"success\": true, \"message\": \"订单提交成功\"}"));
     }
 }

@@ -1,7 +1,6 @@
 package top.buwang.demo.controller;
 
 import top.buwang.demo.vo.merchant;
-import top.buwang.demo.vo.orders;
 import top.buwang.demo.dao.*;
 
 import jakarta.servlet.ServletException;
