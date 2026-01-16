@@ -87,6 +87,9 @@
             border-bottom: 1px solid #eee;
             font-weight: 600;
             font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .merchant-list {
@@ -222,6 +225,31 @@
             padding: 20px;
             color: #999;
         }
+
+        .search-status {
+            font-size: 14px;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .search-tips {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .search-highlight {
+            color: #ff6b35;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -238,11 +266,14 @@
 
 <div class="main-content">
     <div class="search-bar">
-        <input type="text" class="search-input" placeholder="搜索商家或商品...">
+        <input type="text" class="search-input" placeholder="搜索商家或商品..." id="searchInput">
     </div>
 
     <div class="merchant-section">
-        <div class="section-header">推荐商家</div>
+        <div class="section-header">
+            <span id="sectionTitle">推荐商家</span>
+            <span class="search-status" id="searchStatus" style="display: none;"></span>
+        </div>
         <div class="merchant-list" id="merchantList">
             <div class="loading" id="loadingMerchants">加载中...</div>
         </div>
@@ -272,6 +303,8 @@
 <script>
     // 购物车数据
     let cart = [];
+    let currentKeyword = ''; // 当前搜索关键词
+    let searchTimer = null; // 搜索防抖定时器
 
     // 页面加载初始化
     $(function(){
@@ -296,20 +329,60 @@
             confirmOrder();
         })
 
-        // 搜索框输入事件
-        $(".search-input").on("input", function(){
-            searchMerchants($(this).val());
+        // 搜索框输入事件（使用防抖）
+        $("#searchInput").on("input", function(){
+            const keyword = $(this).val().trim();
+
+            // 清除之前的定时器
+            if(searchTimer) {
+                clearTimeout(searchTimer);
+            }
+
+            // 设置新的定时器（防抖，500毫秒后执行搜索）
+            searchTimer = setTimeout(function(){
+                performSearch(keyword);
+            }, 500);
         })
+
+        // 搜索框回车事件
+        $("#searchInput").on("keypress", function(e){
+            if(e.keyCode === 13) { // 回车键
+                const keyword = $(this).val().trim();
+                performSearch(keyword);
+            }
+        })
+    }
+
+    // 执行搜索
+    function performSearch(keyword){
+        currentKeyword = keyword;
+
+        if(keyword === ''){
+            // 如果搜索框为空，显示推荐商家
+            $("#sectionTitle").text('推荐商家');
+            $("#searchStatus").hide();
+            queryMerchants();
+        } else {
+            // 如果有搜索词，执行搜索
+            $("#sectionTitle").text('搜索结果');
+            $("#searchStatus").text('搜索中...').show();
+            searchMerchants(keyword);
+        }
     }
 
     // 查询商家列表（使用jQuery AJAX）
     function queryMerchants(){
+        $("#merchantList").html('<div class="loading">加载中...</div>');
+
         $.ajax({
             type: "GET",
             url: "/index",
+            data: {
+                action: 'get',
+            },
             dataType: "json",
             success: function(merchants){
-                renderMerchants(merchants);
+                renderMerchants(merchants, false);
             },
             error: function(){
                 $("#merchantList").html('<div class="loading">加载失败，请刷新重试</div>');
@@ -319,45 +392,99 @@
 
     // 搜索商家
     function searchMerchants(keyword){
+        $("#merchantList").html('<div class="loading">搜索中...</div>');
+
         $.ajax({
             type: "GET",
-            url: "/search",  // 搜索接口
+            url: "/search",
             data: {
-                keyword: keyword
+                keyword: keyword,
+                action: 'merchant'
             },
             dataType: "json",
-            success: function(merchants){
-                renderMerchants(merchants);
+            success: function(response){
+                // 根据后端返回的数据结构处理
+                let merchants = response;
+
+                // 如果后端返回的是包含结果的对象（如 {data: [], total: 0}）
+                if(response && response.data){
+                    merchants = response.data;
+                }
+
+                renderMerchants(merchants, true);
+
+                // 更新搜索状态
+                if(merchants && merchants.length > 0){
+                    $("#searchStatus").text('共找到 ' + merchants.length + ' 个结果').show();
+                } else {
+                    $("#searchStatus").text('没有找到相关商家').show();
+                }
+            },
+            error: function(xhr, status, error){
+                console.error('搜索失败:', error);
+                $("#merchantList").html('<div class="loading">搜索失败，请稍后重试</div>');
+                $("#searchStatus").text('搜索失败').show();
             }
         });
     }
 
     // 渲染商家列表
-    function renderMerchants(merchants){
+    function renderMerchants(merchants, isSearch){
         const merchantList = $("#merchantList");
+
+        // 清空列表
         merchantList.empty();
 
-        if (merchants.length === 0) {
-            merchantList.html('<div class="loading">暂无商家</div>');
+        if (!merchants || merchants.length === 0) {
+            if(isSearch && currentKeyword){
+                merchantList.html(
+                    '<div class="no-results">' +
+                    '<div>没有找到与 "<span class="search-highlight">' + currentKeyword + '</span>" 相关的商家</div>' +
+                    '<div class="search-tips">请检查搜索词是否正确，或尝试其他关键词</div>' +
+                    '</div>'
+                );
+            } else {
+                merchantList.html('<div class="loading">暂无商家</div>');
+            }
             return;
         }
 
+        // 渲染商家卡片
         for(let i=0; i<merchants.length; i++){
             let merchant = merchants[i];
+
+            // 高亮显示搜索关键词（如果是在搜索结果中）
+            let merchantName = merchant.mname;
+            let merchantAddress = merchant.address;
+
+            if(isSearch && currentKeyword){
+                // 在商家名称和地址中高亮显示搜索词
+                merchantName = highlightKeyword(merchantName, currentKeyword);
+                merchantAddress = highlightKeyword(merchantAddress, currentKeyword);
+            }
+
             merchantList.append(
                 '<div class="merchant-card" onclick="showMerchantDetail(' + merchant.mid + ')">' +
                 '<div class="merchant-image">店铺</div>' +
                 '<div class="merchant-info">' +
-                '<div class="merchant-name">' + merchant.mname + '</div>' +
+                '<div class="merchant-name">' + merchantName + '</div>' +
                 '<div class="merchant-meta">' +
                 '<span class="rating">⭐' + merchant.score + '</span>' +
-                '<span>' + merchant.address + '</span>' +
+                '<span>' + merchantAddress + '</span>' +
                 '</div>' +
                 '<div class="delivery-info">联系电话: ' + merchant.phone + '</div>' +
                 '</div>' +
                 '</div>'
             );
         }
+    }
+
+    // 高亮关键词
+    function highlightKeyword(text, keyword){
+        if(!text || !keyword) return text;
+
+        const regex = new RegExp('(' + keyword + ')', 'gi');
+        return text.replace(regex, '<span class="search-highlight">$1</span>');
     }
 
     // 显示商家详情（跳转到商家详情页）
@@ -467,14 +594,6 @@
         });
     }
 
-    // 获取当前登录用户（如果需要）
-    function getCurrentUser(){
-        // 这里可以从cookie或session获取用户信息
-        return {
-            userId: 1,
-            userName: "测试用户"
-        };
-    }
 </script>
 </body>
 </html>

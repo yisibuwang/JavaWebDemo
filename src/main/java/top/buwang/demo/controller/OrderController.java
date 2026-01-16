@@ -14,7 +14,7 @@ import com.alibaba.fastjson2.JSON;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/api/order")
+@WebServlet("/order")
 public class OrderController extends HttpServlet {
     ordersDao ordersDao = new ordersDao();
 

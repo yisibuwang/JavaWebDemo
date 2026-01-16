@@ -177,6 +177,13 @@
             border-radius: 4px;
         }
 
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
         .modal-actions {
             margin-top: 20px;
             display: flex;
@@ -201,264 +208,350 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <div class="logo">后台管理系统</div>
-            <div class="nav">
-                <div class="nav-item" onclick="location.href='product.jsp'">商品管理</div>
-                <div class="nav-item" onclick="location.href='merchant.jsp'">商家管理</div>
-                <div class="nav-item" onclick="location.href='../index.jsp'">返回前台</div>
+<div class="header">
+    <div class="header-content">
+        <div class="logo">后台管理系统</div>
+        <div class="nav">
+            <div class="nav-item" onclick="location.href='product.jsp'">商品管理</div>
+            <div class="nav-item" onclick="location.href='merchant.jsp'">商家管理</div>
+            <div class="nav-item" onclick="location.href='../index.jsp'">返回前台</div>
+        </div>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="admin-section">
+        <div class="section-header">商品管理</div>
+        <div class="section-content">
+            <div class="action-bar">
+                <button class="add-btn" id="addProductBtn">添加商品</button>
+                <input type="text" class="search-input" placeholder="搜索商品..." id="searchInput">
             </div>
+            <table class="product-table" id="productTable">
+                <thead>
+                <tr>
+                    <th>商品ID</th>
+                    <th>商品名称</th>
+                    <th>描述</th>
+                    <th>价格</th>
+                    <th>状态</th>
+                    <th>商家ID</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td colspan="7" class="loading">加载中...</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <div class="main-content">
-        <div class="admin-section">
-            <div class="section-header">商品管理</div>
-            <div class="section-content">
-                <div class="action-bar">
-                    <button class="add-btn" onclick="openAddModal()">添加商品</button>
-                    <input type="text" class="search-input" placeholder="搜索商品...">
-                </div>
-                <table class="product-table" id="productTable">
-                    <thead>
-                        <tr>
-                            <th>商品ID</th>
-                            <th>商品名称</th>
-                            <th>描述</th>
-                            <th>价格</th>
-                            <th>状态</th>
-                            <th>商家ID</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- 商品数据将通过JavaScript动态生成 -->
-                    </tbody>
-                </table>
+<!-- 添加/编辑商品模态框 -->
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">添加商品</h3>
+        <form id="productForm">
+            <input type="hidden" id="productId">
+            <div class="form-group">
+                <label for="productName">商品名称</label>
+                <input type="text" id="productName" required>
             </div>
-        </div>
+            <div class="form-group">
+                <label for="productDescription">描述</label>
+                <textarea id="productDescription"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="productPrice">价格</label>
+                <input type="number" id="productPrice" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="productStatus">状态</label>
+                <input type="number" id="productStatus" min="0" max="1" value="1">
+            </div>
+            <div class="form-group">
+                <label for="productMid">商家选择</label>
+                <select id="productMid" required>
+                    <option value="">请选择商家</option>
+                    <!-- 商家列表将通过JavaScript动态生成 -->
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" id="cancelBtn">取消</button>
+                <button type="button" class="save-btn" id="saveProductBtn">保存</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <!-- 添加/编辑商品模态框 -->
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <h3 id="modalTitle">添加商品</h3>
-            <form id="productForm">
-                <input type="hidden" id="productId">
-                <div class="form-group">
-                    <label for="productName">商品名称</label>
-                    <input type="text" id="productName" required>
-                </div>
-                <div class="form-group">
-                    <label for="productDescription">描述</label>
-                    <textarea id="productDescription"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="productPrice">价格</label>
-                    <input type="number" id="productPrice" step="0.01" min="0" required>
-                </div>
-                <div class="form-group">
-                    <label for="productStatus">状态</label>
-                    <input type="number" id="productStatus" min="0" max="1" value="1">
-                </div>
-                <div class="form-group">
-                    <label for="productMid">商家选择</label>
-                    <select id="productMid" required>
-                        <!-- 商家列表将通过JavaScript动态生成 -->
-                    </select>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="cancel-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="save-btn" onclick="saveProduct()">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<script src="../js/jquery-3.6.1.min.js"></script>
+<script>
+    // 页面加载初始化
+    $(function(){
+        queryProducts();  // 查询商品列表
+        bindDomEvents();  // 绑定事件
+    })
 
-    <script src="../js/jquery-3.6.1.min.js"></script>
-    <script>
-        // 加载商品列表
-        async function loadProducts() {
-            try {
-                const response = await fetch('/api/product');
-                const products = await response.json();
-                
-                const tbody = document.querySelector('#productTable tbody');
-                tbody.innerHTML = '';
-                
-                products.forEach(product => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${product.productid}</td>
-                        <td>${product.productname}</td>
-                        <td>${product.description}</td>
-                        <td>¥${product.price}</td>
-                        <td>${product.productstatus == 1 ? '启用' : '禁用'}</td>
-                        <td>${product.mid}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="edit-btn" onclick="openEditModal(${product.productid}, '${product.productname}', '${product.description}', ${product.price}, ${product.productstatus}, ${product.mid})">编辑</button>
-                                <button class="delete-btn" onclick="deleteProduct(${product.productid})">删除</button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            } catch (error) {
-                console.error('加载商品失败:', error);
+    // 绑定所有DOM事件
+    function bindDomEvents(){
+        // 添加商品按钮
+        $("#addProductBtn").click(function(){
+            openAddModal();
+        })
+
+        // 保存商品按钮
+        $("#saveProductBtn").click(function(){
+            saveProduct();
+        })
+
+        // 取消按钮
+        $("#cancelBtn").click(function(){
+            closeModal();
+        })
+
+        // 搜索框输入事件
+        $("#searchInput").on("input", function(){
+            searchProducts($(this).val());
+        })
+
+        // 点击模态框外部关闭
+        $(window).click(function(event){
+            if($(event.target).is("#productModal")){
+                closeModal();
             }
-        }
+        })
+    }
 
-        // 加载商家列表到下拉框
-        async function loadMerchants() {
-            try {
-                const response = await fetch('/api/merchant');
-                const merchants = await response.json();
-                
-                const merchantSelect = document.getElementById('productMid');
-                merchantSelect.innerHTML = '';
-                
-                if (merchants.length === 0) {
-                    merchantSelect.innerHTML = '<option value="">暂无商家</option>';
-                    return;
-                }
-                
-                merchants.forEach(merchant => {
-                    const option = document.createElement('option');
-                    option.value = merchant.mid;
-                    option.textContent = merchant.mname;
-                    merchantSelect.appendChild(option);
-                });
-            } catch (error) {
-                console.error('加载商家列表失败:', error);
-                document.getElementById('productMid').innerHTML = '<option value="">加载失败</option>';
+    // 查询商品列表
+    function queryProducts(){
+        $.ajax({
+            type: "GET",
+            url: "/product",
+            data: {
+                action: 'all',
+            },
+            dataType: "json",
+            success: function(products){
+                renderProducts(products);
+            },
+            error: function(){
+                $("#productTable tbody").html('<tr><td colspan="7" style="text-align: center; padding: 20px; color: #999;">加载失败，请刷新重试</td></tr>');
             }
+        });
+    }
+
+    // 搜索商品
+    function searchProducts(keyword){
+        $.ajax({
+            type: "GET",
+            url: "/search",
+            data: {
+                keyword: keyword,
+                action: 'product'
+            },
+            dataType: "json",
+            success: function(products){
+                renderProducts(products);
+            }
+        });
+    }
+
+    // 渲染商品列表
+    function renderProducts(products){
+        let tbody = $("#productTable tbody");
+        tbody.empty();
+
+        if(products.length === 0){
+            tbody.html('<tr><td colspan="7" style="text-align: center; padding: 20px; color: #999;">暂无商品数据</td></tr>');
+            return;
         }
 
-        // 打开添加商品模态框
-        async function openAddModal() {
-            document.getElementById('modalTitle').textContent = '添加商品';
-            document.getElementById('productId').value = '';
-            document.getElementById('productName').value = '';
-            document.getElementById('productDescription').value = '';
-            document.getElementById('productPrice').value = '';
-            document.getElementById('productStatus').value = '1';
-            
-            // 加载商家列表
-            await loadMerchants();
-            
-            document.getElementById('productModal').style.display = 'block';
-        }
+        for(let i=0; i<products.length; i++){
+            let product = products[i];
+            let statusText = product.productstatus == 1 ? '启用' : '禁用';
 
-        // 打开编辑商品模态框
-        async function openEditModal(id, name, description, price, status, mid) {
-            document.getElementById('modalTitle').textContent = '编辑商品';
-            document.getElementById('productId').value = id;
-            document.getElementById('productName').value = name;
-            document.getElementById('productDescription').value = description;
-            document.getElementById('productPrice').value = price;
-            document.getElementById('productStatus').value = status;
-            
-            // 加载商家列表并设置当前商家
-            await loadMerchants();
-            document.getElementById('productMid').value = mid;
-            
-            document.getElementById('productModal').style.display = 'block';
+            tbody.append(
+                '<tr>' +
+                '<td>' + product.productid + '</td>' +
+                '<td>' + product.productname + '</td>' +
+                '<td>' + product.description + '</td>' +
+                '<td>¥' + product.price + '</td>' +
+                '<td>' + statusText + '</td>' +
+                '<td>' + product.mid + '</td>' +
+                '<td>' +
+                '<div class="action-buttons">' +
+                '<button class="edit-btn" onclick="openEditModal(' + product.productid + ', \'' + product.productname + '\', \'' + product.description + '\', ' + product.price + ', ' + product.productstatus + ', ' + product.mid + ')">编辑</button>' +
+                '<button class="delete-btn" onclick="deleteProduct(' + product.productid + ')">删除</button>' +
+                '</div>' +
+                '</td>' +
+                '</tr>'
+            );
         }
+    }
 
-        // 关闭模态框
-        function closeModal() {
-            document.getElementById('productModal').style.display = 'none';
-        }
+    // 加载商家列表到下拉框
+    function loadMerchants(){
+        return new Promise(function(resolve){
+            $.ajax({
+                type: "GET",
+                url: "/index",
+                data: {
+                    action: 'all',
+                },
+                dataType: "json",
+                success: function(merchants){
+                    let merchantSelect = $("#productMid");
+                    merchantSelect.empty();
+                    merchantSelect.append('<option value="">请选择商家</option>');
 
-        // 保存商品
-        async function saveProduct() {
-            const id = document.getElementById('productId').value;
-            const name = document.getElementById('productName').value;
-            const description = document.getElementById('productDescription').value;
-            const price = document.getElementById('productPrice').value;
-            const status = document.getElementById('productStatus').value;
-            const mid = document.getElementById('productMid').value;
-            
-            try {
-                let url = '/api/product';
-                let method = 'POST';
-                
-                const productData = {
-                    productname: name,
-                    description: description,
-                    price: parseFloat(price),
-                    productstatus: parseInt(status),
-                    mid: parseInt(mid)
-                };
-                
-                if (id) {
-                    method = 'PUT';
-                    productData.productid = parseInt(id);
+                    for(let i=0; i<merchants.length; i++){
+                        let merchant = merchants[i];
+                        merchantSelect.append('<option value="' + merchant.mid + '">' + merchant.mname + '</option>');
+                    }
+                    resolve();
+                },
+                error: function(){
+                    $("#productMid").html('<option value="">加载失败</option>');
+                    resolve();
                 }
-                
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(productData)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert(result.message);
+            });
+        });
+    }
+
+    // 打开添加商品模态框
+    function openAddModal(){
+        $("#modalTitle").text('添加商品');
+        $("#productId").val('');
+        $("#productName").val('');
+        $("#productDescription").val('');
+        $("#productPrice").val('');
+        $("#productStatus").val('1');
+
+        // 加载商家列表
+        loadMerchants().then(function(){
+            $("#productModal").show();
+        });
+    }
+
+    // 打开编辑商品模态框
+    function openEditModal(id, name, description, price, status, mid){
+        $("#modalTitle").text('编辑商品');
+        $("#productId").val(id);
+        $("#productName").val(name);
+        $("#productDescription").val(description);
+        $("#productPrice").val(price);
+        $("#productStatus").val(status);
+
+        // 加载商家列表并设置当前商家
+        loadMerchants().then(function(){
+            $("#productMid").val(mid);
+            $("#productModal").show();
+        });
+    }
+
+    // 关闭模态框
+    function closeModal(){
+        $("#productModal").hide();
+    }
+
+    // 保存商品
+    function saveProduct(){
+        let id = $("#productId").val();
+        let name = $("#productName").val();
+        let description = $("#productDescription").val();
+        let price = $("#productPrice").val();
+        let status = $("#productStatus").val();
+        let mid = $("#productMid").val();
+
+        // 数据验证
+        if(!name){
+            alert('请填写商品名称');
+            return;
+        }
+
+        if(!price || price <= 0){
+            alert('请填写正确的价格');
+            return;
+        }
+
+        if(!mid){
+            alert('请选择商家');
+            return;
+        }
+
+        let url = '/product';
+        let method = 'POST';
+        let productData = {
+            productname: name,
+            description: description,
+            price: parseFloat(price),
+            productstatus: parseInt(status),
+            mid: parseInt(mid)
+        };
+
+        if (id) {
+            method = 'PUT';
+            productData.productid = parseInt(id);
+        }
+
+        $.ajax({
+            type: method,
+            url: url,
+            contentType: "application/json",
+            data: JSON.stringify(productData),
+            dataType: "json",
+            success: function(response){
+                if(response.success){
+                    alert(response.message);
                     closeModal();
-                    loadProducts();
+                    queryProducts();
                 } else {
-                    alert('操作失败: ' + result.message);
+                    alert('操作失败: ' + response.message);
                 }
-            } catch (error) {
-                console.error('保存商品失败:', error);
+            },
+            error: function(){
                 alert('保存失败，请刷新重试');
             }
-        }
-
-        // 删除商品
-        async function deleteProduct(id) {
-            if (confirm('确定要删除这个商品吗？')) {
-                try {
-                    const response = await fetch(`/api/product?productid=${id}`, {
-                        method: 'DELETE'
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        alert(result.message);
-                        loadProducts();
-                    } else {
-                        alert('删除失败: ' + result.message);
-                    }
-                } catch (error) {
-                    console.error('删除商品失败:', error);
-                    alert('删除失败，请刷新重试');
-                }
-            }
-        }
-
-        // 关闭模态框（点击外部区域）
-        window.onclick = function(event) {
-            const modal = document.getElementById('productModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        // 初始化加载
-        document.addEventListener('DOMContentLoaded', function() {
-            loadProducts();
         });
-    </script>
+    }
+
+    // 删除商品
+    function deleteProduct(id){
+        if (!confirm('确定要删除这个商品吗？')) {
+            return;
+        }
+
+        $.ajax({
+            type: "DELETE",
+            url: "/product",
+            data: {
+                productid: id
+            },
+            dataType: "json",
+            success: function(response){
+                if(response.success){
+                    alert(response.message);
+                    queryProducts();
+                } else {
+                    alert('删除失败: ' + response.message);
+                }
+            },
+            error: function(){
+                alert('删除失败，请刷新重试');
+            }
+        });
+    }
+</script>
 </body>
 </html>

@@ -201,230 +201,303 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <div class="logo">后台管理系统</div>
-            <div class="nav">
-                <div class="nav-item" onclick="location.href='product.jsp'">商品管理</div>
-                <div class="nav-item" onclick="location.href='merchant.jsp'">商家管理</div>
-                <div class="nav-item" onclick="location.href='../index.jsp'">返回前台</div>
-            </div>
+<div class="header">
+    <div class="header-content">
+        <div class="logo">后台管理系统</div>
+        <div class="nav">
+            <div class="nav-item" onclick="location.href='product.jsp'">商品管理</div>
+            <div class="nav-item" onclick="location.href='merchant.jsp'">商家管理</div>
+            <div class="nav-item" onclick="location.href='../index.jsp'">返回前台</div>
         </div>
     </div>
+</div>
 
-    <div class="main-content">
-        <div class="admin-section">
-            <div class="section-header">商家管理</div>
-            <div class="section-content">
-                <div class="action-bar">
-                    <button class="add-btn" onclick="openAddModal()">添加商家</button>
-                    <input type="text" class="search-input" placeholder="搜索商家...">
-                </div>
+<div class="main-content">
+    <div class="admin-section">
+        <div class="section-header">商家管理</div>
+        <div class="section-content">
+            <div class="action-bar">
+                <button class="add-btn" id="addMerchantBtn">添加商家</button>
+                <input type="text" class="search-input" placeholder="搜索商家..." id="searchInput">
+            </div>
+            <div id="merchantTableContainer">
                 <table class="merchant-table" id="merchantTable">
                     <thead>
-                        <tr>
-                            <th>商家ID</th>
-                            <th>商家名称</th>
-                            <th>联系电话</th>
-                            <th>地址</th>
-                            <th>评分</th>
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
+                    <tr>
+                        <th>商家ID</th>
+                        <th>商家名称</th>
+                        <th>联系电话</th>
+                        <th>地址</th>
+                        <th>评分</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <!-- 商家数据将通过JavaScript动态生成 -->
+                    <tr>
+                        <td colspan="7" class="loading">加载中...</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- 添加/编辑商家模态框 -->
-    <div id="merchantModal" class="modal">
-        <div class="modal-content">
-            <h3 id="modalTitle">添加商家</h3>
-            <form id="merchantForm">
-                <input type="hidden" id="merchantId">
-                <div class="form-group">
-                    <label for="merchantName">商家名称</label>
-                    <input type="text" id="merchantName" required>
-                </div>
-                <div class="form-group">
-                    <label for="merchantPhone">联系电话</label>
-                    <input type="text" id="merchantPhone" required>
-                </div>
-                <div class="form-group">
-                    <label for="merchantAddress">地址</label>
-                    <input type="text" id="merchantAddress" required>
-                </div>
-                <div class="form-group">
-                    <label for="merchantScore">评分</label>
-                    <input type="text" id="merchantScore" value="0">
-                </div>
-                <div class="form-group">
-                    <label for="merchantStatus">状态</label>
-                    <input type="number" id="merchantStatus" min="0" max="1" value="1">
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="cancel-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="save-btn" onclick="saveMerchant()">保存</button>
-                </div>
-            </form>
-        </div>
+<!-- 添加/编辑商家模态框 -->
+<div id="merchantModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">添加商家</h3>
+        <form id="merchantForm">
+            <input type="hidden" id="merchantId">
+            <div class="form-group">
+                <label for="merchantName">商家名称</label>
+                <input type="text" id="merchantName" required>
+            </div>
+            <div class="form-group">
+                <label for="merchantPhone">联系电话</label>
+                <input type="text" id="merchantPhone" required>
+            </div>
+            <div class="form-group">
+                <label for="merchantAddress">地址</label>
+                <input type="text" id="merchantAddress" required>
+            </div>
+            <div class="form-group">
+                <label for="merchantScore">评分</label>
+                <input type="text" id="merchantScore" value="0">
+            </div>
+            <div class="form-group">
+                <label for="merchantStatus">状态</label>
+                <input type="number" id="merchantStatus" min="0" max="1" value="1">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" id="cancelBtn">取消</button>
+                <button type="button" class="save-btn" id="saveMerchantBtn">保存</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <script src="../js/jquery-3.6.1.min.js"></script>
-    <script>
-        // 加载商家列表
-        async function loadMerchants() {
-            try {
-                const response = await fetch('/api/merchant');
-                const merchants = await response.json();
-                
-                const tbody = document.querySelector('#merchantTable tbody');
-                tbody.innerHTML = '';
-                
-                merchants.forEach(merchant => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${merchant.mid}</td>
-                        <td>${merchant.mname}</td>
-                        <td>${merchant.phone}</td>
-                        <td>${merchant.address}</td>
-                        <td>${merchant.score}</td>
-                        <td>${merchant.status == 1 ? '启用' : '禁用'}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="edit-btn" onclick="openEditModal(${merchant.mid}, '${merchant.mname}', '${merchant.phone}', '${merchant.address}', '${merchant.score}', ${merchant.status})">编辑</button>
-                                <button class="delete-btn" onclick="deleteMerchant(${merchant.mid})">删除</button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            } catch (error) {
-                console.error('加载商家失败:', error);
-                document.querySelector('#merchantTable tbody').innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #999;">加载失败，请刷新重试</td></tr>';
+<script src="../js/jquery-3.6.1.min.js"></script>
+<script>
+    // 页面加载初始化
+    $(function(){
+        queryMerchants();  // 查询商家列表
+        bindDomEvents();   // 绑定事件
+    })
+
+    // 绑定所有DOM事件
+    function bindDomEvents(){
+        // 添加商家按钮
+        $("#addMerchantBtn").click(function(){
+            openAddModal();
+        })
+
+        // 保存商家按钮
+        $("#saveMerchantBtn").click(function(){
+            saveMerchant();
+        })
+
+        // 取消按钮
+        $("#cancelBtn").click(function(){
+            closeModal();
+        })
+
+        // 搜索框输入事件
+        $("#searchInput").on("input", function(){
+            searchMerchants($(this).val());
+        })
+
+        // 点击模态框外部关闭
+        $(window).click(function(event){
+            if($(event.target).is("#merchantModal")){
+                closeModal();
             }
+        })
+    }
+
+    // 查询商家列表
+    function queryMerchants(){
+        $.ajax({
+            type: "GET",
+            url: "/index",
+            data: {
+                action: 'all',
+            },
+            dataType: "json",
+            success: function(merchants){
+                renderMerchants(merchants);
+            },
+            error: function(){
+                $("#merchantTable tbody").html('<tr><td colspan="7" style="text-align: center; padding: 20px; color: #999;">加载失败，请刷新重试</td></tr>');
+            }
+        });
+    }
+
+    // 搜索商家
+    function searchMerchants(keyword){
+        $.ajax({
+            type: "GET",
+            url: "/search",
+            data: {
+                keyword: keyword,
+                action: 'merchant'
+            },
+            dataType: "json",
+            success: function(merchants){
+                renderMerchants(merchants);
+            }
+        });
+    }
+
+    // 渲染商家列表
+    function renderMerchants(merchants){
+        let tbody = $("#merchantTable tbody");
+        tbody.empty();
+
+        if(merchants.length === 0){
+            tbody.html('<tr><td colspan="7" style="text-align: center; padding: 20px; color: #999;">暂无商家数据</td></tr>');
+            return;
         }
 
-        // 打开添加商家模态框
-        function openAddModal() {
-            document.getElementById('modalTitle').textContent = '添加商家';
-            document.getElementById('merchantId').value = '';
-            document.getElementById('merchantName').value = '';
-            document.getElementById('merchantPhone').value = '';
-            document.getElementById('merchantAddress').value = '';
-            document.getElementById('merchantScore').value = '0';
-            document.getElementById('merchantStatus').value = '1';
-            document.getElementById('merchantModal').style.display = 'block';
+        for(let i=0; i<merchants.length; i++){
+            let merchant = merchants[i];
+            let statusText = merchant.status == 1 ? '启用' : '禁用';
+
+            tbody.append(
+                '<tr>' +
+                '<td>' + merchant.mid + '</td>' +
+                '<td>' + merchant.mname + '</td>' +
+                '<td>' + merchant.phone + '</td>' +
+                '<td>' + merchant.address + '</td>' +
+                '<td>' + merchant.score + '</td>' +
+                '<td>' + statusText + '</td>' +
+                '<td>' +
+                '<div class="action-buttons">' +
+                '<button class="edit-btn" onclick="openEditModal(' + merchant.mid + ', \'' + merchant.mname + '\', \'' + merchant.phone + '\', \'' + merchant.address + '\', \'' + merchant.score + '\', ' + merchant.status + ')">编辑</button>' +
+                '<button class="delete-btn" onclick="deleteMerchant(' + merchant.mid + ')">删除</button>' +
+                '</div>' +
+                '</td>' +
+                '</tr>'
+            );
+        }
+    }
+
+    // 打开添加商家模态框
+    function openAddModal(){
+        $("#modalTitle").text('添加商家');
+        $("#merchantId").val('');
+        $("#merchantName").val('');
+        $("#merchantPhone").val('');
+        $("#merchantAddress").val('');
+        $("#merchantScore").val('0');
+        $("#merchantStatus").val('1');
+        $("#merchantModal").show();
+    }
+
+    // 打开编辑商家模态框
+    function openEditModal(id, name, phone, address, score, status){
+        $("#modalTitle").text('编辑商家');
+        $("#merchantId").val(id);
+        $("#merchantName").val(name);
+        $("#merchantPhone").val(phone);
+        $("#merchantAddress").val(address);
+        $("#merchantScore").val(score);
+        $("#merchantStatus").val(status);
+        $("#merchantModal").show();
+    }
+
+    // 关闭模态框
+    function closeModal(){
+        $("#merchantModal").hide();
+    }
+
+    // 保存商家
+    function saveMerchant(){
+        let id = $("#merchantId").val();
+        let name = $("#merchantName").val();
+        let phone = $("#merchantPhone").val();
+        let address = $("#merchantAddress").val();
+        let score = $("#merchantScore").val();
+        let status = $("#merchantStatus").val();
+
+        // 数据验证
+        if(!name || !phone || !address){
+            alert('请填写完整信息');
+            return;
         }
 
-        // 打开编辑商家模态框
-        function openEditModal(id, name, phone, address, score, status) {
-            document.getElementById('modalTitle').textContent = '编辑商家';
-            document.getElementById('merchantId').value = id;
-            document.getElementById('merchantName').value = name;
-            document.getElementById('merchantPhone').value = phone;
-            document.getElementById('merchantAddress').value = address;
-            document.getElementById('merchantScore').value = score;
-            document.getElementById('merchantStatus').value = status;
-            document.getElementById('merchantModal').style.display = 'block';
+        let url = '/index';
+        let method = 'POST';
+        let merchantData = {
+            mname: name,
+            phone: phone,
+            address: address,
+            score: score,
+            status: parseInt(status)
+        };
+
+        if (id) {
+            method = 'PUT';
+            merchantData.mid = parseInt(id);
         }
 
-        // 关闭模态框
-        function closeModal() {
-            document.getElementById('merchantModal').style.display = 'none';
-        }
-
-        // 保存商家
-        async function saveMerchant() {
-            const id = document.getElementById('merchantId').value;
-            const name = document.getElementById('merchantName').value;
-            const phone = document.getElementById('merchantPhone').value;
-            const address = document.getElementById('merchantAddress').value;
-            const score = document.getElementById('merchantScore').value;
-            const status = document.getElementById('merchantStatus').value;
-            
-            try {
-                let url = '/api/merchant';
-                let method = 'POST';
-                
-                const merchantData = {
-                    mname: name,
-                    phone: phone,
-                    address: address,
-                    score: score,
-                    status: parseInt(status)
-                };
-                
-                if (id) {
-                    method = 'PUT';
-                    merchantData.mid = parseInt(id);
-                }
-                
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(merchantData)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert(result.message);
+        $.ajax({
+            type: method,
+            url: url,
+            contentType: "application/json",
+            data: JSON.stringify(merchantData),
+            dataType: "json",
+            success: function(response){
+                if(response.success){
+                    alert(response.message);
                     closeModal();
-                    loadMerchants();
+                    queryMerchants();
                 } else {
-                    alert('操作失败: ' + result.message);
+                    alert('操作失败: ' + response.message);
                 }
-            } catch (error) {
-                console.error('保存商家失败:', error);
+            },
+            error: function(){
                 alert('保存失败，请刷新重试');
             }
-        }
-
-        // 删除商家
-        async function deleteMerchant(id) {
-            if (confirm('确定要删除这个商家吗？')) {
-                try {
-                    const response = await fetch(`/api/merchant?mid=${id}`, {
-                        method: 'DELETE'
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        alert(result.message);
-                        loadMerchants();
-                    } else {
-                        alert('删除失败: ' + result.message);
-                    }
-                } catch (error) {
-                    console.error('删除商家失败:', error);
-                    alert('删除失败，请刷新重试');
-                }
-            }
-        }
-
-        // 关闭模态框（点击外部区域）
-        window.onclick = function(event) {
-            const modal = document.getElementById('merchantModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        // 初始化加载
-        document.addEventListener('DOMContentLoaded', function() {
-            loadMerchants();
         });
-    </script>
+    }
+
+    // 删除商家
+    function deleteMerchant(id){
+        if (!confirm('确定要删除这个商家吗？')) {
+            return;
+        }
+
+        $.ajax({
+            type: "DELETE",
+            url: "/index",
+            data: {
+                mid: id
+            },
+            dataType: "json",
+            success: function(response){
+                if(response.success){
+                    alert(response.message);
+                    queryMerchants();
+                } else {
+                    alert('删除失败: ' + response.message);
+                }
+            },
+            error: function(){
+                alert('删除失败，请刷新重试');
+            }
+        });
+    }
+</script>
 </body>
 </html>

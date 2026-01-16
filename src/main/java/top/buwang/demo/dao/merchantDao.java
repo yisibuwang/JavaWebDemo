@@ -86,4 +86,31 @@ public class merchantDao {          //数据用的操作类
             db.closeResource(conn);
         }
     }
+
+    public List<merchant> searchMerchant(String mname){
+        DB db = new DB();
+        List<merchant> merchantList = new ArrayList<merchant>();        //创建空的商户列表，用于存储查询结果
+        Connection conn = null;
+        try {
+            conn = db.getConnection();       //调用db的getConnection方法，获取数据库连接
+            String sql = "select * from merchant where mname like ?";
+            ResultSet rs = db.executeQuery(conn, sql,new Object[]{"%"+mname+"%"});  //查询商户信息
+            while (rs.next()) {
+                merchant m = new merchant();
+                m.setMid(rs.getInt("mid"));
+                m.setMname(rs.getString("mname"));
+                m.setPhone(rs.getString("phone"));
+                m.setAddress(rs.getString("address"));
+                m.setPicture(rs.getBytes("picture"));
+                m.setScore(rs.getString("score"));
+                m.setStatus(rs.getInt("status"));
+                merchantList.add(m);                                //将封装好的对象添加到列表中
+            }
+        } catch (SQLException | RuntimeException e) {         //DB类抛出的异常是RuntimeException，先甩锅传上去再说
+            throw new RuntimeException(e);
+        } finally {
+            db.closeResource(conn);     //关闭连接
+        }
+        return merchantList;
+    }
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
@@ -16,15 +17,25 @@ import jakarta.servlet.http.HttpServletResponse;
 import top.buwang.demo.dao.ProductDao;
 import top.buwang.demo.vo.Product;
 
-@WebServlet("/api/product")
+@WebServlet("/product")
 public class ProductController extends HttpServlet {
     ProductDao productDao = new ProductDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json; charset=UTF-8");
-        List<Product> products = productDao.getAllProduct();
-        response.getWriter().write(JSON.toJSONString(products));
+        String action = request.getParameter("action");
+        if(Objects.equals(action, "all")) {
+            response.setContentType("application/json; charset=UTF-8");
+            List<Product> products = productDao.getAllProduct();
+            response.getWriter().write(JSON.toJSONString(products));
+        }
+        else if (Objects.equals(action, "get")) {
+            String mid = request.getParameter("mid");
+            List<Product> products = productDao.searchProduct(mid);
+            response.getWriter().write(JSON.toJSONString(products));
+        }
+        else
+            response.getWriter().write("{\"message\":\"无效的操作\"}");
     }
     
     @Override

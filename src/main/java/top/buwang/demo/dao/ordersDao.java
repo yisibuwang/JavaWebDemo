@@ -80,4 +80,27 @@ public class ordersDao {
             db.closeResource(conn);
         }
     }
+
+    public List<orders> searchorders(int ordersid){
+        List<orders> ordersList = new ArrayList<orders>();
+        Connection conn = null;
+        try {
+            conn = db.getConnection();
+            String get_orders = "select * from orders where ordersid like ?";
+            ResultSet rs = db.executeQuery(conn, get_orders,new Object[]{"%"+ordersid+"%"});
+            while(rs.next()) {
+                orders o = new orders();
+                o.setOrdersid(rs.getInt("ordersid"));
+                o.setCartid(rs.getInt("cartid"));
+                ordersList.add(o);
+            }
+        }
+        catch (SQLException | RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+        finally{
+            db.closeResource(conn);
+        }
+        return ordersList;
+    }
 }

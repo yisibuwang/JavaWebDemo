@@ -37,6 +37,7 @@ public class ProductDao {
         return productList;
     }
 
+
     public boolean addProduct(String productname, String description, BigDecimal price, byte[] picture, int productstatus, int mid) {
         Connection conn = null;
         try{
@@ -77,5 +78,34 @@ public class ProductDao {
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<Product> searchProduct(String productname){
+        List<Product> productList = new ArrayList<Product>();
+        Connection conn = null;
+        try {
+            conn = db.getConnection();
+            String get_product = "select * from product where productname like ?";
+            // 需要在 executeQuery 中传递参数
+            ResultSet rs = db.executeQuery(conn, get_product, new Object[] {"%" + productname + "%"});
+            while(rs.next()) {
+                Product p = new Product();
+                p.setProductid(rs.getInt("productid"));
+                p.setProductname(rs.getString("productname"));
+                p.setDescription(rs.getString("description"));
+                p.setPrice(rs.getBigDecimal("price"));  // 使用getBigDecimal
+                p.setPicture(rs.getBytes("picture"));
+                p.setProductstatus(rs.getInt("productstatus"));
+                p.setMid(rs.getInt("mid"));
+                productList.add(p);
+            }
+        }
+        catch (SQLException | RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+        finally{
+            db.closeResource(conn);
+        }
+        return productList;
     }
 }
